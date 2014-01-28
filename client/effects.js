@@ -2,10 +2,10 @@ Effects = {};
 
 Effects.snippetEffects = {};
 
-Effects.snippetEffects.slideshow = function(snippet) {
+Effects.snippetEffects.slideshow = function(snippet, overrideConfig) {
 
   return {
-    start : function(overrideConfig) {
+    start : function() {
 
       var config = {
         wordDelay : 300,
@@ -36,10 +36,10 @@ Effects.snippetEffects.slideshow = function(snippet) {
   };
 };
 
-Effects.snippetEffects.allAtOnce = function(snippet) {
+Effects.snippetEffects.allAtOnce = function(snippet, overrideConfig) {
 
   return {
-    start : function(overrideConfig) {
+    start : function() {
 
       var config = {};
 

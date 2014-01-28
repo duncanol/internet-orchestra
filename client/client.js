@@ -1,3 +1,4 @@
 Meteor.startup(function() {
-  Conducter.start();
+  var orchestra = new Orchestra(new Composer(), new Conductor());
+  orchestra.start();
 });
