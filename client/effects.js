@@ -14,7 +14,7 @@ Effects.snippetEffects.slideshow = function(snippet) {
 
       jQuery.extend(config, overrideConfig);
 
-      var $domNode = config.addSlideshowContainerToDomFn();
+      var $domNode = config.addTextContainerToDomFn();
 
       var words = snippet.text.split(" ", 100);
       var source = snippet.source;
@@ -32,6 +32,25 @@ Effects.snippetEffects.slideshow = function(snippet) {
           }, config.sourceDelay);
         }
       }, config.wordDelay);
+    }
+  };
+};
+
+Effects.snippetEffects.allAtOnce = function(snippet) {
+
+  return {
+    start : function(overrideConfig) {
+
+      var config = {};
+
+      jQuery.extend(config, overrideConfig);
+
+      var $domNode = config.addTextContainerToDomFn();
+
+      var words = snippet.text;
+      var source = snippet.source;
+      $domNode.append(words);
+      $domNode.append(' <a href="' + source + '">' + source + '</a>');
     }
   };
 };

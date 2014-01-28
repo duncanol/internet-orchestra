@@ -16,13 +16,10 @@ Conducter.start = function(overrideConfig) {
 
   Meteor.call('getSnippet', function(error, snippet) {
 
-    var slideshow = Effects.snippetEffects.slideshow({
-      text : snippet.text,
-      source : snippet.source
-    });
+    var slideshow = Effects.snippetEffects.slideshow(snippet);
 
     slideshow.start({
-      addSlideshowContainerToDomFn : addNewSlideshowDomFn,
+      addTextContainerToDomFn : addNewSlideshowDomFn,
       wordDelay : 300,
       sourceDelay : 1000,
     });
@@ -32,16 +29,26 @@ Conducter.start = function(overrideConfig) {
 
     Meteor.call('getSnippet', function(error, snippet) {
 
-      var slideshow = Effects.snippetEffects.slideshow({
-        text : snippet.text,
-        source : snippet.source
-      });
+      var slideshow = Effects.snippetEffects.slideshow(snippet);
 
       slideshow.start({
-        addSlideshowContainerToDomFn : addNewSlideshowDomFn,
+        addTextContainerToDomFn : addNewSlideshowDomFn,
         wordDelay : 300,
         sourceDelay : 1000,
       });
     });
   }, 2000);
+  
+  Meteor.setTimeout(function() {
+
+    Meteor.call('getSnippet', function(error, snippet) {
+
+      var allAtOnce = Effects.snippetEffects.allAtOnce(snippet);
+
+      allAtOnce.start({
+        addTextContainerToDomFn : addNewSlideshowDomFn
+      });
+    });
+  }, 1000);
+
 };
