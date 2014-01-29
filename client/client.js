@@ -13,6 +13,8 @@ Meteor.startup(function() {
 
       text.val('');
       source.val('');
+
+      jQuery('#input-snippets-feedback').append('Thanks!');
     }
 
     return false;
