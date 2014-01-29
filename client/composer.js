@@ -4,14 +4,8 @@ Composer = function Composer() {
 
 Composer.prototype.compose = function(conductor) {
 
-  var addNewSlideshowDomFn = function() {
-    var $messagesBlock = jQuery('#snippet-show');
-    return jQuery('<li class="well"></li>').appendTo($messagesBlock);
-  };
-
   Meteor.call('getSnippet', function(errors, snippet) {
     var effect = Effects.snippetEffects.slideshow(snippet, {
-      addTextContainerToDomFn : addNewSlideshowDomFn,
       wordDelay : 300,
       sourceDelay : 1000,
     });
@@ -20,7 +14,6 @@ Composer.prototype.compose = function(conductor) {
 
   Meteor.call('getSnippet', function(errors, snippet) {
     var effect = Effects.snippetEffects.slideshow(snippet, {
-      addTextContainerToDomFn : addNewSlideshowDomFn,
       wordDelay : 100,
       sourceDelay : 500,
     });
@@ -28,9 +21,7 @@ Composer.prototype.compose = function(conductor) {
   });
 
   Meteor.call('getSnippet', function(errors, snippet) {
-    var effect = Effects.snippetEffects.allAtOnce(snippet, {
-      addTextContainerToDomFn : addNewSlideshowDomFn
-    });
+    var effect = Effects.snippetEffects.allAtOnce(snippet);
     conductor.conduct(effect, 1000);
   });
 };

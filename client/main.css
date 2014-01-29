@@ -15,3 +15,6 @@ ul.snippet-block li {
 	word-break: break-all;
 }
 
+#snippet-share {
+	margin-bottom: 10px;
+}

@@ -5,7 +5,7 @@ Effects.snippetEffects = {};
 Effects.snippetEffects.slideshow = function(snippet, overrideConfig) {
 
   return {
-    start : function() {
+    start : function(getDomNodeFn) {
 
       var config = {
         wordDelay : 300,
@@ -14,7 +14,7 @@ Effects.snippetEffects.slideshow = function(snippet, overrideConfig) {
 
       jQuery.extend(config, overrideConfig);
 
-      var $domNode = config.addTextContainerToDomFn();
+      var $domNode = getDomNodeFn();
 
       var words = snippet.text.split(" ", 100);
       var source = snippet.source;
@@ -39,13 +39,13 @@ Effects.snippetEffects.slideshow = function(snippet, overrideConfig) {
 Effects.snippetEffects.allAtOnce = function(snippet, overrideConfig) {
 
   return {
-    start : function() {
+    start : function(getDomNodeFn) {
 
       var config = {};
 
       jQuery.extend(config, overrideConfig);
 
-      var $domNode = config.addTextContainerToDomFn();
+      var $domNode = getDomNodeFn();
 
       var words = snippet.text;
       var source = snippet.source;
