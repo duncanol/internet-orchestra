@@ -8,3 +8,13 @@ Meteor.methods({
     return snippet;
   }
 });
+
+Meteor.startup(function() {
+  // var i = 0;
+  // Meteor.setInterval(function() {
+  // snippetsCollection.insert({
+  // text : 'New text inserted ' + (i += 10),
+  // source : 'local'
+  // });
+  // }, 2000);
+});
