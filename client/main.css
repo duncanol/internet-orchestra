@@ -3,6 +3,10 @@ body {
 	background-color: black;
 }
 
+.main-container {
+	margin-left: 30px;
+}
+
 h1 {
 	color: gray;
 }
@@ -11,7 +15,7 @@ ul.snippet-block {
 	list-style: none;
 }
 
-ul.snippet-block li {
+.snippet-block {
 	word-break: break-all;
 }
 

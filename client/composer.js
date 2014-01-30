@@ -4,8 +4,23 @@ Composer = function Composer() {
 
 Composer.prototype.compose = function(conductor) {
 
+  var self = this;
+
+  this.conductor = conductor;
+  var rollingPane = this.rollingPane();
+
+  Meteor.setTimeout(function() {
+    var gridPane = self.gridPane();
+    rollingPane.stop();
+  }, 10000);
+};
+
+Composer.prototype.rollingPane = function() {
+
+  var self = this;
+
   var rollingPane = new Panes.RollingPane({
-    domParent : 'div.container'
+    domParent : 'div.main-container'
   });
   rollingPane.start();
 
@@ -16,7 +31,7 @@ Composer.prototype.compose = function(conductor) {
           wordDelay : 300,
           sourceDelay : 1000,
         });
-        conductor.conduct(rollingPane, effect, 0);
+        self.conductor.conduct(rollingPane, effect, 0);
         rollingPaneAdd(Math.round(Math.random() * 10000));
       });
     }, timeout);
@@ -26,6 +41,35 @@ Composer.prototype.compose = function(conductor) {
 
   Meteor.call('getSnippet', function(errors, snippet) {
     var effect = Effects.snippetEffects.allAtOnce(snippet);
-    conductor.conduct(rollingPane, effect, 1000);
+    self.conductor.conduct(rollingPane, effect, 1000);
   });
+
+  return rollingPane;
+};
+
+Composer.prototype.gridPane = function() {
+
+  var self = this;
+
+  var gridPane = new Panes.GridPane({
+    domParent : 'div.main-container'
+  });
+  gridPane.start();
+
+  var gridPaneAdd = function(timeout) {
+    Meteor.setTimeout(function() {
+      Meteor.call('getSnippet', function(errors, snippet) {
+        var effect = Effects.snippetEffects.slideshow(snippet, {
+          wordDelay : 300,
+          sourceDelay : 1000,
+        });
+        self.conductor.conduct(gridPane, effect, 0);
+        gridPaneAdd(Math.round(Math.random() * 10000));
+      });
+    }, timeout);
+  };
+
+  gridPaneAdd(0);
+
+  return gridPane;
 };
