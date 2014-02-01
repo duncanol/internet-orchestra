@@ -1,19 +1,19 @@
-lookupSourceCollection = new Meteor.Collection('lookupSources');
-
 var getRandomEntry = function(collection, query) {
   // TODO - horribly inefficient!
   var entries = collection.find(query).fetch();
   var count = entries.length;
-  var i = Math.round(Math.random() * (count - 1));
+  var i = Math.floor(Math.random() * (count - 1));
   return entries[i];
 };
 
 Meteor.methods({
   getSnippet : function() {
 
-    var snippet = getRandomEntry(snippetsCollection, {});
-    console.log("Returning snippet " + snippet);
-    return snippet;
+    if (snippetsCollection.find({}).count() > 0) {
+      var snippet = getRandomEntry(snippetsCollection, {});
+      console.log("Returning snippet " + snippet);
+      return snippet;
+    }
   }
 });
 
@@ -22,36 +22,61 @@ Scraper = function() {
 
 Scraper.prototype.scrapeUrl = function(url, patterns) {
 
-  var text = '<h1>This is a header</h1>\
-    <p>This is a paragraph.</p>';
+  console.log("Scraping URL " + url + " for patterns " + patterns + "...");
 
-  snippetsCollection.insert({
-    text : 'This is a paragraph',
-    source : url
-  });
+  for ( var i = 0; i < patterns.length; i++) {
+    var pattern = patterns[i];
+
+    var result = Meteor.http.get(url);
+    var html = cheerio.load(result.content);
+    var matches = html(pattern);
+
+    if (matches != null && matches.length > 0) {
+
+      matches.each(function(i, elem) {
+
+        var domNode = cheerio(elem);
+        var text = domNode.text();
+        var type = pattern;
+
+        var existing = snippetsCollection.find({
+          text : text,
+          source : url,
+          type : type
+        }).count();
+
+        if (existing == 0) {
+
+          console.log('Inserting ' + text);
+
+          var record = {
+            text : text,
+            source : url,
+            type : type
+          };
+
+          if (domNode.is('a')) {
+            record.href = domNode.attr('href');
+          }
+
+          snippetsCollection.insert(record);
+        }
+      });
+    }
+  }
 };
 
 Meteor.startup(function() {
 
-  // var scraper = new Scraper();
-  //
-  // var i = 0;
-  // Meteor.setInterval(function() {
-  //
-  // var source = getRandomEntry(lookupSources)
-  // scraper.scrapeUrl(url, );
-  //
-  // snippetsCollection.insert({
-  // text : 'New text inserted ' + (i += 10),
-  // source : 'local'
-  // });
-  // }, 2000);
+  var scraper = new Scraper();
 
-  // must be
-  // exposed.
+  Meteor.setInterval(function() {
+    if (lookupSourceCollection.find({}).count() > 0) {
 
-  var result = Meteor.http.get("http://www.theonion.com");
-  var html = cheerio.load(result.content);
-  console.log(html.html());
-
+      var url = getRandomEntry(lookupSourceCollection, {
+        type : 'url'
+      });
+      scraper.scrapeUrl(url.source, [ 'h1', 'h2', 'h3', 'h4', 'p', 'a' ]);
+    }
+  }, 2000);
 });

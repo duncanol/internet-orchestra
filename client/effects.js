@@ -18,18 +18,21 @@ Effects.snippetEffects.slideshow = function(snippet, overrideConfig) {
       var source = snippet.source;
       var i = 0;
       var interval = 0;
+      var $header = jQuery('<h2>' + snippet.type + '</h2>');
+
+      var $paragraph;
+      if (snippet.href != null) {
+        $paragraph = jQuery('<a href="' + snippet.href + '"><span></span></a>');
+      } else {
+        $paragraph = jQuery('<p><span></span></p>');
+      }
+      $domNode.append($header);
+      $domNode.append($paragraph);
+
       interval = Meteor.setInterval(function() {
         var nextWord = words[i++];
 
-        if (i == 0) {
-          $domNode.append('<p>');
-        }
-
-        $domNode.append(nextWord + (i > 0 ? " " : ""));
-
-        if (i == words.length) {
-          $domNode.append('</p>');
-        }
+        $paragraph.find('span').append(nextWord + (i > 0 ? " " : ""));
 
         if (i == words.length) {
           Meteor.clearInterval(interval);
