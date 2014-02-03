@@ -19,19 +19,18 @@ Composer.prototype.rollingPane = function() {
 
   var _this = this;
 
-  var rollingPane = new Panes.RollingPane({
+  var pane = new Panes.RollingPane({
     domParent : 'div.main-container'
   });
-  rollingPane.start();
+  pane.start();
 
   var rollingPaneAdd = function(timeout) {
     Meteor.setTimeout(function() {
       Meteor.call('getSnippet', function(errors, snippet) {
-        var effect = Effects.snippetEffects.slideshow(snippet, {
-          wordDelay : Math.round(Math.random() * 300),
-          sourceDelay : Math.round(Math.random() * 1000),
-        });
-        _this.conductor.conduct(rollingPane, effect, 0);
+
+        var effect = _this.slideshowEffect(snippet);
+        _this.conductor.conduct(pane, effect, 0);
+
         rollingPaneAdd(Math.round(Math.random() * 5000));
       });
     }, timeout);
@@ -40,30 +39,40 @@ Composer.prototype.rollingPane = function() {
   rollingPaneAdd(0);
 
   Meteor.call('getSnippet', function(errors, snippet) {
-    var effect = Effects.snippetEffects.allAtOnce(snippet);
-    self.conductor.conduct(rollingPane, effect, 1000);
+    var effect = _this.allAtOnceEffect(snippet);
+    self.conductor.conduct(pane, effect, 1000);
   });
 
-  return rollingPane;
+  return pane;
+};
+
+Composer.prototype.slideshowEffect = function(snippet) {
+  return Effects.snippetEffects.slideshow(snippet, {
+    wordDelay : Math.round(Math.random() * 300),
+    sourceDelay : Math.round(Math.random() * 1000),
+  });
+};
+
+Composer.prototype.allAtOnceEffect = function(snippet) {
+  return Effects.snippetEffects.allAtOnce(snippet);
 };
 
 Composer.prototype.gridPane = function() {
 
   var _this = this;
 
-  var gridPane = new Panes.GridPane({
+  var pane = new Panes.GridPane({
     domParent : 'div.main-container'
   });
-  gridPane.start();
+  pane.start();
 
   var gridPaneAdd = function(timeout) {
     Meteor.setTimeout(function() {
       Meteor.call('getSnippet', function(errors, snippet) {
-        var effect = Effects.snippetEffects.slideshow(snippet, {
-          wordDelay : 300,
-          sourceDelay : 1000,
-        });
-        _this.conductor.conduct(gridPane, effect, 0);
+
+        var effect = _this.slideshowEffect(snippet);
+        _this.conductor.conduct(pane, effect, 0);
+
         gridPaneAdd(Math.round(Math.random() * 10000));
       });
     }, timeout);
@@ -71,5 +80,5 @@ Composer.prototype.gridPane = function() {
 
   gridPaneAdd(0);
 
-  return gridPane;
+  return pane;
 };
