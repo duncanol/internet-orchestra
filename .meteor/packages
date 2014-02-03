@@ -11,3 +11,4 @@ bootstrap
 jquery
 http
 cheerio
+coffeescript
