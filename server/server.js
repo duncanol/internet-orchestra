@@ -11,7 +11,7 @@ Meteor.methods({
 
     if (snippetsCollection.find({}).count() > 0) {
       var snippet = getRandomEntry(snippetsCollection, {});
-      console.log("Returning snippet " + snippet);
+      console.log("Returning snippet " + snippet.text);
       return snippet;
     }
   }
@@ -36,30 +36,33 @@ Scraper.prototype.scrapeUrl = function(url, patterns) {
       matches.each(function(i, elem) {
 
         var domNode = cheerio(elem);
-        var text = domNode.text();
+        var text = domNode.text().trim();
         var type = pattern;
 
-        var existing = snippetsCollection.find({
-          text : text,
-          source : url,
-          type : type
-        }).count();
+        if (text.length > 0) {
 
-        if (existing == 0) {
-
-          console.log('Inserting ' + text);
-
-          var record = {
+          var existing = snippetsCollection.find({
             text : text,
             source : url,
             type : type
-          };
+          }).count();
 
-          if (domNode.is('a')) {
-            record.href = domNode.attr('href');
+          if (existing == 0) {
+
+            console.log('Inserting ' + text);
+
+            var record = {
+              text : text,
+              source : url,
+              type : type
+            };
+
+            if (domNode.is('a')) {
+              record.href = domNode.attr('href');
+            }
+
+            snippetsCollection.insert(record);
           }
-
-          snippetsCollection.insert(record);
         }
       });
     }
@@ -68,15 +71,43 @@ Scraper.prototype.scrapeUrl = function(url, patterns) {
 
 Meteor.startup(function() {
 
+  // resetAllSourcesLastCheckedDates();
+
   var scraper = new Scraper();
 
   Meteor.setInterval(function() {
     if (lookupSourceCollection.find({}).count() > 0) {
 
+      var yesterday = new Date();
+      yesterday.setMilliseconds(yesterday.getMilliseconds() - (24 * 60 * 60 * 1000));
+
       var url = getRandomEntry(lookupSourceCollection, {
-        type : 'url'
+        type : 'url',
+        lastChecked : {
+          $lt : yesterday
+        }
       });
-      scraper.scrapeUrl(url.source, [ 'h1', 'h2', 'h3', 'h4', 'p', 'a' ]);
+
+      if (url != null) {
+        scraper.scrapeUrl(url.source, [ 'h1', 'h2', 'h3', 'h4', 'p', 'a' ]);
+        url.lastChecked = new Date();
+        lookupSourceCollection.update({
+          _id : url._id
+        }, url);
+      }
     }
   }, 2000);
 });
+
+var resetAllSourcesLastCheckedDates = function() {
+  var sources = lookupSourceCollection.find({}).fetch();
+
+  for ( var i = 0; i < sources.length; i++) {
+    var date = new Date();
+    date.setYear(0);
+    sources[i].lastChecked = date;
+    lookupSourceCollection.update({
+      _id : sources[i]._id
+    }, sources[i]);
+  }
+};
