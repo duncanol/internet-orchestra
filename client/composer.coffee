@@ -9,7 +9,7 @@ class @Composer
 
     Meteor.setInterval (-> 
       _this.refreshPane()
-    ), 2000
+    ), 120000
 
 
     @refreshPane()
