@@ -37,6 +37,16 @@ class @GridPane extends Pane
     jQuery.extend @config, overrideConfig
     @$domParent = jQuery(@config.domParent)
     @$paneDiv = jQuery("<div class=\"grid-pane\"></div>")
+
+    addSummat = ->
+      $paneRow = jQuery("<div class=\"row\"></div>")
+      x = 0
+
+      while x < @config.width
+        $paneRow.append "<div class=\"grid-pane-cell grid-pane-cell-empty snippet-block well span" + Math.round(12 / @config.width) + "\"></div>"
+        x++
+      @$paneDiv.append $paneRow
+
     y = 0
 
     while y < @config.height

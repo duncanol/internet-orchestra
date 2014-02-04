@@ -1,5 +1,7 @@
 class SnippetEffect
 
+  start: ($domNode) ->
+    throw 'Must implement "start" function for Effect subclass'
 
 
 class @Slideshow extends SnippetEffect
@@ -52,31 +54,37 @@ class @AllAtOnce extends SnippetEffect
 
 class @Ticker extends SnippetEffect
   
-  constructor: (snippet, overrideConfig) ->
+
+  constructor: (@snippet, @overrideConfig) ->
+
 
   start: ($domNode) ->
+    
     config =
-      charDelay: 300
+      charDelay: 100
       sourceDelay: 1000
 
-    jQuery.extend config, overrideConfig
-    source = snippet.source
+    jQuery.extend config, @overrideConfig
+    text = @snippet.text
+    source = @snippet.source
     i = 0
     interval = 0
-    $header = jQuery("<h2>" + snippet.type + "</h2>")
+    $header = jQuery("<h2>" + @snippet.type + "</h2>")
     $paragraph = undefined
-    if snippet.href?
-      $paragraph = jQuery("<a href=\"" + snippet.href + "\"><span></span></a>")
+    
+    if @snippet.href?
+      $paragraph = jQuery("<a href=\"" + @snippet.href + "\"><span></span></a>")
     else
       $paragraph = jQuery("<p><span></span></p>")
+
     $domNode.append $header
     $domNode.append $paragraph
     interval = Meteor.setInterval(->
-      nextChar = source[i++]
+      nextChar = text[i++]
       $paragraph.find("span").append nextChar
       if i is source.length
         Meteor.clearInterval interval
         Meteor.setTimeout (->
           $domNode.append "<p><a href=\"" + source + "\">" + source + "</a></p>"
         ), config.sourceDelay
-    , config.wordDelay)
+    , config.charDelay)
