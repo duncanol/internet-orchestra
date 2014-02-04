@@ -21,7 +21,7 @@ class @RollingPane extends Pane
 
   addEffect: (effect) ->
     $listItems = @$paneList.find("li")
-    $listItems[0].remove()  if $listItems.length is @config.numberOfItems
+    if $listItems.length is @config.numberOfItems then $listItems[0].remove()
     $snippetContainer = jQuery("<li class=\"well\"></li>")
     $snippetContainer.appendTo @$paneList
     effect.start $snippetContainer
@@ -38,26 +38,15 @@ class @GridPane extends Pane
     @$domParent = jQuery(@config.domParent)
     @$paneDiv = jQuery("<div class=\"grid-pane\"></div>")
 
-    addSummat = ->
-      $paneRow = jQuery("<div class=\"row\"></div>")
-      x = 0
-
-      while x < @config.width
-        $paneRow.append "<div class=\"grid-pane-cell grid-pane-cell-empty snippet-block well span" + Math.round(12 / @config.width) + "\"></div>"
-        x++
-      @$paneDiv.append $paneRow
-
     y = 0
-
-    while y < @config.height
+    while y++ < @config.height
       $paneRow = jQuery("<div class=\"row\"></div>")
-      x = 0
-
-      while x < @config.width
-        $paneRow.append "<div class=\"grid-pane-cell grid-pane-cell-empty snippet-block well span" + Math.round(12 / @config.width) + "\"></div>"
-        x++
       @$paneDiv.append $paneRow
-      y++
+      
+      x = 0
+      while x++ < @config.width
+        $paneRow.append "<div class=\"grid-pane-cell grid-pane-cell-empty snippet-block well span" + Math.round(12 / @config.width) + "\"></div>"
+        
 
   start: ->
     @$paneDiv.appendTo @$domParent

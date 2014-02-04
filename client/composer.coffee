@@ -11,8 +11,8 @@ class @Composer
       _this.refreshPane()
     ), 120000
 
-
     @refreshPane()
+
 
   refreshPane: ->
     if @currentPane?  

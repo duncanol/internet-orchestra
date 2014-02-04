@@ -16,16 +16,17 @@ class @Slideshow extends SnippetEffect
     jQuery.extend config, @overrideConfig
     words = @snippet.text.split(" ", 100)
     source = @snippet.source
-    i = 0
-    interval = 0
     $header = jQuery("<h2>" + @snippet.type + "</h2>")
-    $paragraph = undefined
-    if @snippet.href?
-      $paragraph = jQuery("<a href=\"" + @snippet.href + "\"><span></span></a>")
+    
+    $paragraph = if @snippet.href?
+      jQuery("<a href=\"" + @snippet.href + "\"><span></span></a>")
     else
-      $paragraph = jQuery("<p><span></span></p>")
+      jQuery("<p><span></span></p>")
+    
     $domNode.append $header
     $domNode.append $paragraph
+    
+    i = 0
     interval = Meteor.setInterval(->
       nextWord = words[i++]
       $paragraph.find("span").append nextWord + ((if i > 0 then " " else ""))
@@ -69,18 +70,18 @@ class @Ticker extends SnippetEffect
     jQuery.extend config, @overrideConfig
     text = @snippet.text
     source = @snippet.source
-    i = 0
-    interval = 0
     $header = jQuery("<h2>" + @snippet.type + "</h2>")
     $paragraph = undefined
     
-    if @snippet.href?
-      $paragraph = jQuery("<a href=\"" + @snippet.href + "\"><span></span></a>")
+    $paragraph = if @snippet.href?
+      jQuery("<a href=\"" + @snippet.href + "\"><span></span></a>")
     else
-      $paragraph = jQuery("<p><span></span></p>")
+      jQuery("<p><span></span></p>")
 
     $domNode.append $header
     $domNode.append $paragraph
+    
+    i = 0
     interval = Meteor.setInterval(->
       nextChar = text[i++]
       $paragraph.find("span").append nextChar
