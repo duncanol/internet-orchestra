@@ -7,13 +7,18 @@ class @Composer
     _this = this
     @conductor = conductor
 
-    
-    # Meteor.setInterval refreshPane 60000
+    Meteor.setInterval (-> 
+      _this.refreshPane()
+    ), 2000
+
 
     @refreshPane()
 
   refreshPane: ->
-    if @currentPane? then @currentPane.stop
+    if @currentPane?  
+      @currentPane.stop()
+      Meteor.clearTimeout @currentPane.timeout
+
     @currentPane = @randomPane().call(@)
     @currentPane.start()
 
@@ -22,7 +27,7 @@ class @Composer
     _this = this
     pane = new RollingPane(domParent: "div.main-container")
     rollingPaneAdd = (timeout) ->
-      Meteor.setTimeout (->
+      pane.timeout = Meteor.setTimeout (->
         Meteor.call "getSnippet", (errors, snippet) ->
           effect = _this.randomEffect()(snippet)
           _this.conductor.conduct pane, effect, 0
@@ -38,7 +43,7 @@ class @Composer
     _this = this
     pane = new GridPane(domParent: "div.main-container")
     gridPaneAdd = (timeout) ->
-      Meteor.setTimeout (->
+      pane.timeout = Meteor.setTimeout (->
         Meteor.call "getSnippet", (errors, snippet) ->
           effect = _this.randomEffect()(snippet)
           _this.conductor.conduct pane, effect, 0

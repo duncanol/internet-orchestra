@@ -45,8 +45,10 @@ class @AllAtOnce extends SnippetEffect
   start: ($domNode) ->
     config = {}
     jQuery.extend config, @overrideConfig
+    type = @snippet.type
     words = @snippet.text
     source = @snippet.source
+    $domNode.append "<h2>" + type + "</h2>"
     $domNode.append "<p>" + words + "</p>"
     $domNode.append "<p><a href=\"" + source + "\">" + source + "</a></p>"
 
