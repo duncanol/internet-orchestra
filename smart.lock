@@ -2,13 +2,19 @@
   "meteor": {},
   "dependencies": {
     "basePackages": {
-      "cheerio": {}
+      "cheerio": {},
+      "font-awesome": {}
     },
     "packages": {
       "cheerio": {
         "git": "https://github.com/andreioprisan/meteor-cheerio.git",
         "tag": "v0.3.2",
         "commit": "f7b7b8c4ad4dbac7e9b34a4b110150cd5ec95bae"
+      },
+      "font-awesome": {
+        "git": "https://github.com/nate-strauser/meteor-font-awesome.git",
+        "tag": "v4.0.3",
+        "commit": "61e9361384347547ae144f8228faa4deffda23db"
       }
     }
   }

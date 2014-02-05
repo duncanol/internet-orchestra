@@ -16,7 +16,7 @@ class @Slideshow extends SnippetEffect
     jQuery.extend config, @overrideConfig
     words = @snippet.text.split(" ", 100)
     source = @snippet.source
-    $header = jQuery("<h2>" + @snippet.type + "</h2>")
+    $header = jQuery("<h2>" + @snippet.type + "</h2> <i class='fa fa-frown-o fa-2x fa-1-3x'></i> <i class='fa fa-smile-o fa-2x fa-1-3x'></i> <i class='fa fa-ban-o fa-2x fa-1-3x'></i> <i class='fa fa-comment-o fa-2x fa-1-3x'></i> <i class='fa fa-lock fa-2x fa-1-3x'></i>")
     
     $paragraph = if @snippet.href?
       jQuery("<a href=\"" + @snippet.href + "\"><span></span></a>")

@@ -1,5 +1,6 @@
 {
   "packages": {
-    "cheerio": {}
+    "cheerio": {},
+    "font-awesome": {}
   }
 }

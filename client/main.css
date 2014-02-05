@@ -19,6 +19,10 @@ ul.snippet-block {
 	word-break: break-all;
 }
 
+.snippet-block .fa-1-3x {
+	font-size: 1.3em;
+}
+
 #snippet-share {
 	margin-bottom: 10px;
 }
