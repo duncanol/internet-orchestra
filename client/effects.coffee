@@ -16,24 +16,24 @@ class @Slideshow extends SnippetEffect
     jQuery.extend config, @overrideConfig
     words = @snippet.text.split(" ", 100)
     source = @snippet.source
-    $header = jQuery("<h2>" + @snippet.type + "</h2> <i class='fa fa-frown-o fa-2x fa-1-3x'></i> <i class='fa fa-smile-o fa-2x fa-1-3x'></i> <i class='fa fa-ban-o fa-2x fa-1-3x'></i> <i class='fa fa-comment-o fa-2x fa-1-3x'></i> <i class='fa fa-lock fa-2x fa-1-3x'></i>")
     
-    $paragraph = if @snippet.href?
-      jQuery("<a href=\"" + @snippet.href + "\"><span></span></a>")
-    else
-      jQuery("<p><span></span></p>")
-    
-    $domNode.append $header
-    $domNode.append $paragraph
-    
+    fragment = Template.effectblock(
+      @snippet
+      )
+
+    $domNode.append fragment
+    $paragraph = $domNode.find '.snippet-block-paragraph'
+
     i = 0
     interval = Meteor.setInterval(->
       nextWord = words[i++]
-      $paragraph.find("span").append nextWord + ((if i > 0 then " " else ""))
+      $paragraph.append nextWord + ((if i > 0 then " " else ""))
       if i is words.length
         Meteor.clearInterval interval
         Meteor.setTimeout (->
-          $domNode.append "<p><a href=\"" + source + "\">" + source + "</a></p>"
+          $anchor = $domNode.find '.snippet-block-source-url' 
+          $anchor.attr('href', source)
+          $anchor.text source
         ), config.sourceDelay
     , config.wordDelay)
 

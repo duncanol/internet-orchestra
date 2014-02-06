@@ -19,3 +19,22 @@
     </div>
   </div>
 </body>
+
+<template name="effectblock">
+  <h2>{{type}}</h2>
+  <i class="fa fa-frown-o fa-2x fa-1-3x"></i> 
+  <i class="fa fa-smile-o fa-2x fa-1-3x"></i> 
+  <i class="fa fa-ban-o fa-2x fa-1-3x"></i> 
+  <i class="fa fa-comment-o fa-2x fa-1-3x"></i> 
+  <i class="fa fa-lock fa-2x fa-1-3x"></i>
+  
+  {{#if href}}
+    <a href="{href}"><span class="snippet-block-paragraph"></span></a>
+  {{/if}}
+  {{#unless href}}
+    <p><span class="snippet-block-paragraph"></span></p>
+  {{/unless}}
+
+  <p><a href="" class="snippet-block-source-url"></a></p>
+</template>
+  
