@@ -74,6 +74,6 @@ class @Composer
     paneFunctions[random]
 
   randomEffect: ->
-    effectsFunctions = [@slideshowEffect]
+    effectsFunctions = [@slideshowEffect, @allAtOnceEffect, @tickerEffect]
     random = Math.floor(Math.random() * effectsFunctions.length)
     effectsFunctions[random]

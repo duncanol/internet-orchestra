@@ -17,11 +17,7 @@ class @Slideshow extends SnippetEffect
     words = @snippet.text.split(" ", 100)
     source = @snippet.source
     
-    fragment = Template.effectblock(
-      @snippet
-      )
-
-    $domNode.append fragment
+    $domNode.append Template.effectblock @snippet
     $paragraph = $domNode.find '.snippet-block-paragraph'
 
     i = 0
@@ -46,13 +42,14 @@ class @AllAtOnce extends SnippetEffect
   start: ($domNode) ->
     config = {}
     jQuery.extend config, @overrideConfig
-    type = @snippet.type
-    words = @snippet.text
-    source = @snippet.source
-    $domNode.append "<h2>" + type + "</h2>"
-    $domNode.append "<p>" + words + "</p>"
-    $domNode.append "<p><a href=\"" + source + "\">" + source + "</a></p>"
+    $domNode.append Template.effectblock @snippet
+    
+    $paragraph = $domNode.find '.snippet-block-paragraph'
+    $paragraph.append @snippet.text
 
+    $anchor = $domNode.find '.snippet-block-source-url' 
+    $anchor.attr('href', @snippet.source)
+    $anchor.text @snippet.source
 
 
 class @Ticker extends SnippetEffect
@@ -70,24 +67,19 @@ class @Ticker extends SnippetEffect
     jQuery.extend config, @overrideConfig
     text = @snippet.text
     source = @snippet.source
-    $header = jQuery("<h2>" + @snippet.type + "</h2>")
-    $paragraph = undefined
-    
-    $paragraph = if @snippet.href?
-      jQuery("<a href=\"" + @snippet.href + "\"><span></span></a>")
-    else
-      jQuery("<p><span></span></p>")
 
-    $domNode.append $header
-    $domNode.append $paragraph
+    $domNode.append Template.effectblock @snippet
+    $paragraph = $domNode.find '.snippet-block-paragraph'
     
     i = 0
     interval = Meteor.setInterval(->
       nextChar = text[i++]
-      $paragraph.find("span").append nextChar
+      $paragraph.append nextChar
       if i is source.length
         Meteor.clearInterval interval
         Meteor.setTimeout (->
-          $domNode.append "<p><a href=\"" + source + "\">" + source + "</a></p>"
+          $anchor = $domNode.find '.snippet-block-source-url' 
+          $anchor.attr('href', source)
+          $anchor.text source
         ), config.sourceDelay
     , config.charDelay)
