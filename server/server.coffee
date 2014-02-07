@@ -14,7 +14,8 @@ Meteor.methods getSnippet: ->
 
 class Scraper
 
-  scrapeUrl: (url, patterns) ->
+  scrapeUrl: (source, patterns) ->
+    url = source.source
     console.log "Scraping URL " + url + " for patterns " + patterns + "..."
     
     for pattern in patterns
@@ -34,19 +35,22 @@ class Scraper
             ).count()
             if existing is 0
               console.log "Inserting " + text
+              
               record =
                 text: text
                 source: url
                 type: type
 
-              record.href = domNode.attr("href")  if domNode.is("a")
+              if domNode.is("a") then record.href = domNode.attr("href")
+              if source.tags? then record.tags = source.tags
+
               snippetsCollection.insert record
         )
 
 
 Meteor.startup ->
   
-  # resetAllSourcesLastCheckedDates();
+  resetAllSourcesLastCheckedDates();
   scraper = new Scraper()
   
   Meteor.setInterval (->
@@ -63,7 +67,7 @@ Meteor.startup ->
         lookupSourceCollection.update
           _id: url._id
         , url
-        scraper.scrapeUrl url.source, ["h1", "h2", "h3", "h4", "p", "a"]
+        scraper.scrapeUrl url, ["h1", "h2", "h3", "h4", "p", "a"]
   ), 10000
 
 

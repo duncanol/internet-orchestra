@@ -1,10 +1,11 @@
 <head>
   <title>Internet scrapings</title>
+  <link rel="stylesheet" href="/font-awesome-4.0.3/css/font-awesome.min.css">
 </head>
 
 <body>
   <div class="main-container">
-    <h1>Internet<small>scrapings <i class="fa fa-cog" style="color: #CCC"></i></small></h1>
+    <h1>Internet<small>scrapings <i class="fa fa-cog" style="color: #CCC">Settings</i></small></h1>
     
     <div class="input-snippets">
       <input type="text" id="snippet-text" placeholder="Text snippet" />
@@ -21,15 +22,22 @@
 </body>
 
 <template name="effectblock">
-  <h2>{{type}}</h2>
-  <i class="fa fa-frown-o fa-2x fa-1-3x"></i> 
-  <i class="fa fa-smile-o fa-2x fa-1-3x"></i> 
-  <i class="fa fa-ban-o fa-2x fa-1-3x"></i> 
-  <i class="fa fa-comment-o fa-2x fa-1-3x"></i> 
-  <i class="fa fa-lock fa-2x fa-1-3x"></i>
+  <h2>{{type}}
+    <small>
+      <i class="fa fa-smile-o"> Like</i><span class="divider">&nbsp;</span>
+      <i class="fa fa-frown-o"> NoLike</i><span class="divider">&nbsp;</span> 
+      <i class="fa fa-ban-o"> Ban</i><span class="divider">&nbsp;</span>
+      <i class="fa fa-comment-o"> Comment</i><span class="divider">&nbsp;</span> 
+      <i class="fa fa-lock"> Hold</i><span class="divider">&nbsp;</span>
+    </small>
+  </h2>
+  
+  {{#each tags}}
+    <a href="#">#{{this}}</a>
+  {{/each}}
   
   {{#if href}}
-    <a href="{href}"><span class="snippet-block-paragraph"></span></a>
+    <a href="{{href}}"><span class="snippet-block-paragraph"></span></a>
   {{/if}}
   {{#unless href}}
     <p><span class="snippet-block-paragraph"></span></p>
