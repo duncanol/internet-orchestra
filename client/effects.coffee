@@ -75,7 +75,7 @@ class @Ticker extends SnippetEffect
     interval = Meteor.setInterval(->
       nextChar = text[i++]
       $paragraph.append nextChar
-      if i is source.length
+      if i is text.length
         Meteor.clearInterval interval
         Meteor.setTimeout (->
           $anchor = $domNode.find '.snippet-block-source-url' 
