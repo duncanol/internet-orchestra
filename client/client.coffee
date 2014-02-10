@@ -14,5 +14,15 @@ Meteor.startup ->
 
 
 Meteor.startup ->
+  
+  Meteor.call "getTagCounts", (errors, tagCounts) ->
+    if not errors?  
+      for tagCount in tagCounts
+        jQuery('.all-tags').append tagCount.tag + " (" + tagCount.count + ") / "
+    else
+      console.error errors
+      
   orchestra = new Orchestra(new Composer(), new Conductor())
   orchestra.start()
+
+   
