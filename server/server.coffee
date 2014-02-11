@@ -7,7 +7,12 @@ getRandomEntry = (collection, query) ->
   entries[i]
 
 Meteor.methods 
-  getSnippet: ->
+  getSnippet: (snippetTypes, snippetTags) ->
+
+    filter = {}
+    if snippetTypes? then filter.type = {$in: snippetTypes}
+    if snippetTags? then filter.tags = {$in: snippetTags}
+    
     if snippetsCollection.find({}).count() > 0
       snippet = getRandomEntry(snippetsCollection, {})
       console.log "Returning snippet " + snippet.text

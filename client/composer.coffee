@@ -23,6 +23,26 @@ class @Composer
     @currentPane.start()
 
 
+  flashwords: ->
+    _this = this
+    pane = new RollingPane(domParent: "div.main-container", numberOfItems: 1)
+    steadyBeat = (Math.random() * 3000) + 1000
+    rollingPaneAdd = (timeout) ->
+      pane.timeout = Meteor.setTimeout (->
+        Meteor.call "getSnippet", (errors, snippet) ->
+          words = snippet.text.split(" ")
+          randomWord = words[Math.floor Math.random() * words.length]
+          snippet.text = randomWord
+          effect = _this.allAtOnceEffect(snippet,
+            template: Template.minimalisteffectblock)
+          _this.conductor.conduct pane, effect, 0
+          rollingPaneAdd steadyBeat
+
+      ), timeout
+
+    rollingPaneAdd 0
+    pane
+
   rollingPane: ->
     _this = this
     pane = new RollingPane(domParent: "div.main-container")
@@ -55,21 +75,30 @@ class @Composer
     pane
 
 
-  slideshowEffect: (snippet) ->
-    new Slideshow snippet,
+  slideshowEffect: (snippet, overrideConfig) ->
+    config =
       wordDelay: Math.round(Math.random() * 300)
       sourceDelay: Math.round(Math.random() * 1000)
 
-  tickerEffect: (snippet) ->
-    new Ticker snippet,
+    jQuery.extend config, overrideConfig
+    
+    new Slideshow snippet, config
+
+  tickerEffect: (snippet, overrideConfig) ->
+    config =
       charDelay: Math.round(Math.random() * 100)
       sourceDelay: Math.round(Math.random() * 1000)
 
-  allAtOnceEffect: (snippet) ->
-    new AllAtOnce(snippet)
+    jQuery.extend config, overrideConfig
+    
+    new Ticker snippet, config
+
+  allAtOnceEffect: (snippet, overrideConfig) ->
+    new AllAtOnce snippet, overrideConfig
 
   randomPane: ->
-    paneFunctions = [@gridPane, @rollingPane]
+    paneFunctions = [@flashwords] 
+    #@gridPane, @rollingPane
     random = Math.floor(Math.random() * paneFunctions.length)
     paneFunctions[random]
 

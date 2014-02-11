@@ -40,16 +40,20 @@ class @AllAtOnce extends SnippetEffect
   constructor: (@snippet, @overrideConfig) ->
 
   start: ($domNode) ->
-    config = {}
+    config = 
+      template: Template.effectblock
+
     jQuery.extend config, @overrideConfig
-    $domNode.append Template.effectblock @snippet
+
+    $domNode.append config.template @snippet
     
     $paragraph = $domNode.find '.snippet-block-paragraph'
     $paragraph.append @snippet.text
 
-    $anchor = $domNode.find '.snippet-block-source-url' 
-    $anchor.attr('href', @snippet.source)
-    $anchor.text @snippet.source
+    $anchor = $domNode.find '.snippet-block-source-url'
+    if ($anchor.length > 0) 
+      $anchor.attr('href', @snippet.source)
+      $anchor.text @snippet.source
 
 
 class @Ticker extends SnippetEffect
