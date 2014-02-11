@@ -30,3 +30,9 @@ ul.snippet-block {
 #input-snippets-feedback {
 	color: #DFD;
 }
+
+.snippet-block-paragraph-centered {
+	text-align: center;
+	font-weight: bolder;
+	font-size: xx-large;
+}
