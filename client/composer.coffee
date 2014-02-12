@@ -7,41 +7,54 @@ class @Composer
     _this = this
     @conductor = conductor
 
-    Meteor.setInterval (-> 
-      _this.refreshPane()
-    ), 120000
+    playNextComposition = ->
+      composition = _this.randomPane().call(_this)    
+      composition.play(playNextComposition)
 
-    @refreshPane()
-
-
-  refreshPane: ->
-    if @currentPane?  
-      @currentPane.stop()
-      Meteor.clearTimeout @currentPane.timeout
-
-    @currentPane = @randomPane().call(@)
-    @currentPane.start()
+    playNextComposition()
 
 
   flashwords: ->
-    _this = this
-    pane = new RollingPane(domParent: "div.main-container", numberOfItems: 1)
+
+    _this = @
+    
+    composition = new Composition(
+      name: "flashwords", 
+      tempo: 'not yet implemented',
+      transitionSmoothness: 'not yet implemented')
+
+    pane = new RollingPane(
+      domParent: "div.main-container", 
+      numberOfItems: 1)
+
     steadyBeat = (Math.random() * 3000) + 1000
-    rollingPaneAdd = (timeout) ->
-      pane.timeout = Meteor.setTimeout (->
+    
+    section = new Section(
+      pane: pane, 
+      tempo: 'not yet implemented')
+    
+    composition.addSection(section)
+
+    sectionLength = (Math.random() * 48) + 16
+    for i in [1..sectionLength]
+      noteFunction = -> 
         Meteor.call "getSnippet", (errors, snippet) ->
           words = snippet.text.split(" ")
           randomWord = words[Math.floor Math.random() * words.length]
           snippet.text = randomWord
-          effect = _this.allAtOnceEffect(snippet,
+          effect = new AllAtOnce(snippet,
             template: Template.minimalisteffectblock)
-          _this.conductor.conduct pane, effect, 0
-          rollingPaneAdd steadyBeat
+          _this.conductor.conduct pane, effect
 
-      ), timeout
+      note = new Note(
+        noteFunction: noteFunction, 
+        length: steadyBeat)
+      
+      section.addNote(note)
+    
+    composition
 
-    rollingPaneAdd 0
-    pane
+
 
   rollingPane: ->
     _this = this
@@ -66,7 +79,7 @@ class @Composer
       pane.timeout = Meteor.setTimeout (->
         Meteor.call "getSnippet", (errors, snippet) ->
           effect = _this.randomEffect()(snippet)
-          _this.conductor.conduct pane, effect, 0
+          _this.conductor.conduct pane, effect
           gridPaneAdd Math.round(Math.random() * 10000)
 
       ), timeout
@@ -97,8 +110,8 @@ class @Composer
     new AllAtOnce snippet, overrideConfig
 
   randomPane: ->
-    paneFunctions = [@flashwords] 
-    #@gridPane, @rollingPane
+    paneFunctions = [@flashwords]
+    ##, @gridPane, @rollingPane] 
     random = Math.floor(Math.random() * paneFunctions.length)
     paneFunctions[random]
 
