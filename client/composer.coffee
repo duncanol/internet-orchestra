@@ -8,8 +8,8 @@ class @Composer
     @conductor = conductor
 
     playNextComposition = ->
-      composition = _this.randomPane().call(_this)    
-      composition.play(playNextComposition)
+      composition = _this.randomPane().call(_this)
+      conductor.conduct(composition)    
 
     playNextComposition()
 
@@ -37,14 +37,14 @@ class @Composer
 
     sectionLength = (Math.random() * 48) + 16
     for i in [1..sectionLength]
-      noteFunction = -> 
+      getEffect = (getEffectCallback) -> 
         Meteor.call "getSnippet", (errors, snippet) ->
           words = snippet.text.split(" ")
           randomWord = words[Math.floor Math.random() * words.length]
           snippet.text = randomWord
           effect = new AllAtOnce(snippet,
             template: Template.minimalisteffectblock)
-          _this.conductor.conduct pane, effect
+          getEffectCallback(effect)
 
       note = new Note(
         noteFunction: noteFunction, 
