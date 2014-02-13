@@ -9,7 +9,7 @@ class @Composer
 
     playNextComposition = ->
       composition = _this.randomPane().call(_this)
-      conductor.conduct(composition)    
+      conductor.conduct(composition, playNextComposition)    
 
     playNextComposition()
 
@@ -47,7 +47,7 @@ class @Composer
           getEffectCallback(effect)
 
       note = new Note(
-        noteFunction: noteFunction, 
+        getEffect: getEffect, 
         length: steadyBeat)
       
       section.addNote(note)

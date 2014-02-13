@@ -1,3 +1,11 @@
+@headTail = (array) ->
+  if (array.length == 0) 
+    [null, Array()]
+  else if (array.length == 1) 
+    [array[0], Array()]
+  else 
+    [array[0], array[1..array.length - 1]]
+
 Meteor.startup ->
   jQuery("#snippet-share").on "click", ->
     text = jQuery("#snippet-text")
