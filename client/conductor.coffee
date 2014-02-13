@@ -16,11 +16,11 @@ class @Conductor
         if (remaining.length > 0) 
           conductNextSection(remaining)
         else
+          console.debug("<<<<<<<< Finished conducting Composition #{composition.name} with #{composition.sections.length} sections")
           afterFinishedCallback()
-          console.debug("Finished conducting Composition #{composition.name}")
       ) 
 
-    console.debug("Starting to conduct Composition #{composition.name}")
+    console.debug(">>>>>>>> Starting to conduct Composition #{composition.name} with #{composition.sections.length} sections")
     conductNextSection composition.sections
   
 
@@ -32,28 +32,28 @@ class @Conductor
     conductNextNote = (notes) ->
       [note, remaining] = headTail(notes)
       _this.conductNote(note, pane, -> 
-        if (remaining.length - 1) 
+        if (remaining.length > 0) 
           conductNextNote(remaining)
         else
           pane.stop()
+          console.debug("<<<< Finished conducting Section with #{section.notes.length} notes with note pattern #{section.notePattern}")
           afterFinishedCallback()
-          console.debug("Finished conducting Section with #{section.notes.length} notes")
       ) 
 
-    console.debug("Starting to conduct Section with #{section.notes.length} notes")
+    console.debug(">>>> Starting to conduct Section with #{section.notes.length} notes with note pattern #{section.notePattern}")
     conductNextNote section.notes
 
 
   conductNote: (note, pane, afterFinishedCallback) ->
 
-    addEffectToPane = (effect) ->
-      pane.addEffect effect
+    console.debug(">> Starting to conduct note with #{note.length} length")
 
-    console.debug("Starting to conduct note with #{note.length} length")
+    note.getEffect((effect) ->
+      pane.addEffect effect
+    )
 
     Meteor.setTimeout(->
-      note.getEffect(addEffectToPane) 
-      console.debug("Finished conducting note with #{note.length} length")
+      console.debug("<< Finished conducting note with #{note.length} length")
       afterFinishedCallback()
     , note.length)
 

@@ -18,39 +18,50 @@ class @Composer
 
     _this = @
     
+    tempo = ((Math.random() * 1000) + 1000)
+      
+    notePatterns = [{name: '4 beats', pattern: [1/4, 1/4, 1/4, 1/4]}]
+    
     composition = new Composition(
       name: "flashwords", 
-      tempo: 'not yet implemented',
+      tempo: tempo,
       transitionSmoothness: 'not yet implemented')
 
-    pane = new RollingPane(
-      domParent: "div.main-container", 
-      numberOfItems: 1)
+    numberOfSections = 2
 
-    steadyBeat = (Math.random() * 3000) + 1000
-    
-    section = new Section(
-      pane: pane, 
-      tempo: 'not yet implemented')
-    
-    composition.addSection(section)
+    for sectionIndex in [1..numberOfSections] 
 
-    sectionLength = (Math.random() * 48) + 16
-    for i in [1..sectionLength]
-      getEffect = (getEffectCallback) -> 
-        Meteor.call "getSnippet", (errors, snippet) ->
-          words = snippet.text.split(" ")
-          randomWord = words[Math.floor Math.random() * words.length]
-          snippet.text = randomWord
-          effect = new AllAtOnce(snippet,
-            template: Template.minimalisteffectblock)
-          getEffectCallback(effect)
+      notePattern = notePatterns[0]
 
-      note = new Note(
-        getEffect: getEffect, 
-        length: steadyBeat)
+      pane = new RollingPane(
+        domParent: "div.main-container", 
+        numberOfItems: 1)
+
+      section = new Section(
+        pane: pane, 
+        tempo: tempo,
+        notePattern: notePattern.name)
+
+      barLength = 4
+      barLengthMillis = Math.floor(barLength * section.tempo)
       
-      section.addNote(note)
+      for noteIndex in [0...notePattern.pattern.length]
+        getEffect = (getEffectCallback) -> 
+          Meteor.call "getSnippet", (errors, snippet) ->
+            words = snippet.text.split(" ")
+            randomWord = words[Math.floor Math.random() * words.length]
+            snippet.text = randomWord
+            effect = new AllAtOnce(snippet,
+              template: Template.minimalisteffectblock)
+            getEffectCallback(effect)
+
+        note = new Note(
+          getEffect: getEffect, 
+          length: notePattern.pattern[noteIndex] * barLengthMillis)
+        
+        section.addNote(note)
+
+      composition.addSection(section)
     
     composition
 
