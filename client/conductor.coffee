@@ -26,7 +26,7 @@ class @Conductor
     console.debug(">>>>>>>> Starting to conduct Composition #{composition.name} with #{composition.sections.length} sections")
     Session.set("composition", 
       name: composition.name, 
-      bpm: 60 / (composition.tempo * 1000)
+      bpm: Math.floor(60 / (composition.tempo / 1000)) * 4
     )
     conductNextSection composition.sections, 0
   
