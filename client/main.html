@@ -1,11 +1,11 @@
 <head>
-  <title>Internet scrapings</title>
+  <title>Internet Symphony</title>
   <link rel="stylesheet" href="/font-awesome-4.0.3/css/font-awesome.min.css">
 </head>
 
 <body>
   <div class="main-container">
-    <h1>Internet<small>scrapings <i class="fa fa-cog" style="color: #CCC">Settings</i></small></h1>
+    <h1>Internet<small>sympohony <i class="fa fa-cog" style="color: #CCC">Settings</i></small></h1>
     
     <div class="input-snippets">
       <input type="text" id="snippet-text" placeholder="Text snippet" />
@@ -21,6 +21,15 @@
         </div>
       </div>
     </div>
+
+    <div class="row">
+      <div class="span12">
+        <div class="well">
+          {{> nowPlayingTemplate}}
+        </div>
+      </div>
+    </div>
+
 
     <div class="row">
       <ul id="snippet-show" class="snippet-block span12">
@@ -57,5 +66,17 @@
 
 <template name="minimalisteffectblock">
   <p class="snippet-block-paragraph-centered"><span class="snippet-block-paragraph"></span></p>
+</template>
+
+<template name="nowPlayingTemplate">
+  <div>
+    <span>Now playing </span><span class="composition-name">"{{ composition.name }}" at {{composition.bpm}} BPM</span>
+  </div>
+  <div>
+    <span>Section: </span><span class="section-number">{{ sectionNumber }}</span>
+  </div>
+  <div>
+    <span>Note: </span><span class="note-number">{{ noteNumber }}</span>
+  </div>
 </template>
     
