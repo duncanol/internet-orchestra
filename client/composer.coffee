@@ -8,16 +8,84 @@ class @Composer
     @conductor = conductor
 
     playNextComposition = ->
-      composition = _this.randomPane().call(_this)
-      conductor.conduct(composition, playNextComposition)    
+      composition = _this.randomPane().call(_this, (composition) ->
+        conductor.conduct(composition, playNextComposition)    
+      )
 
     playNextComposition()
 
 
-  flashwords: ->
+  flashwords: (finishedBuildingCompositionCallback) ->
 
     _this = @
+
     
+    buildNotes = (notePattern, section, barLengthMillis, async, finishedBuildingNotesCallback) ->
+      
+      [thisNote, remainingNotes] = headTail(notePattern)
+
+      if (thisNote == null)
+        finishedBuildingNotesCallback()
+      else
+
+        asyncEffect = (effectCreatedCallback) ->
+          Meteor.call "getSnippet", (errors, snippet) ->
+            words = snippet.text.split(" ")
+            randomWord = words[Math.floor Math.random() * words.length]
+            snippet.text = randomWord
+            effect = new AllAtOnce(snippet,
+              template: Template.minimalisteffectblock)
+            effectCreatedCallback(effect)
+        
+        addNoteAndContinue = (effect, async) ->
+          if (async)
+            note = new Note(
+              asyncEffect: effect, 
+              length: thisNote * barLengthMillis)
+          else 
+            note = new Note(
+              effect: effect, 
+              length: thisNote * barLengthMillis)
+          
+          section.addNote(note)
+          buildNotes remainingNotes, section, barLengthMillis, async, finishedBuildingNotesCallback
+          
+
+        if (async)
+          addNoteAndContinue asyncEffect, async
+        else 
+          asyncEffect((effect) -> 
+            addNoteAndContinue effect, async
+          )
+          
+
+
+
+    buildSections = (remainingSections, finishedBuildingSectionsCallback) ->
+
+      if (remainingSections == 0) 
+        finishedBuildingSectionsCallback()
+      else 
+        notePattern = notePatterns[0]
+
+        pane = new RollingPane(
+          domParent: "div.main-container", 
+          numberOfItems: 1)
+
+        section = new Section(
+          pane: pane, 
+          tempo: tempo,
+          notePattern: notePattern.name)
+
+        composition.addSection(section)
+        
+        barLength = 4
+        barLengthMillis = Math.floor(barLength * section.tempo)
+
+        buildNotes notePattern.pattern, section, barLengthMillis, false, ->
+          buildSections remainingSections - 1, finishedBuildingSectionsCallback
+
+
     tempo = ((Math.random() * 1000) + 1000)
       
     notePatterns = [{name: '4 beats', pattern: [1/4, 1/4, 1/4, 1/4]}]
@@ -27,43 +95,10 @@ class @Composer
       tempo: tempo,
       transitionSmoothness: 'not yet implemented')
 
-    numberOfSections = 2
+    numberOfSections = 16
 
-    for sectionIndex in [1..numberOfSections] 
-
-      notePattern = notePatterns[0]
-
-      pane = new RollingPane(
-        domParent: "div.main-container", 
-        numberOfItems: 1)
-
-      section = new Section(
-        pane: pane, 
-        tempo: tempo,
-        notePattern: notePattern.name)
-
-      barLength = 4
-      barLengthMillis = Math.floor(barLength * section.tempo)
-      
-      for noteIndex in [0...notePattern.pattern.length]
-        getEffect = (getEffectCallback) -> 
-          Meteor.call "getSnippet", (errors, snippet) ->
-            words = snippet.text.split(" ")
-            randomWord = words[Math.floor Math.random() * words.length]
-            snippet.text = randomWord
-            effect = new AllAtOnce(snippet,
-              template: Template.minimalisteffectblock)
-            getEffectCallback(effect)
-
-        note = new Note(
-          getEffect: getEffect, 
-          length: notePattern.pattern[noteIndex] * barLengthMillis)
-        
-        section.addNote(note)
-
-      composition.addSection(section)
-    
-    composition
+    buildSections numberOfSections, ->
+      finishedBuildingCompositionCallback(composition)
 
 
 

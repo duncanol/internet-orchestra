@@ -56,11 +56,14 @@ class @Conductor
 
     console.debug(">> Starting to conduct note with #{note.length} length")
     Session.set("noteNumber", noteIndex + 1)
-      
-    note.getEffect((effect) ->
-      pane.addEffect effect
-    )
-
+    
+    if (note.asyncEffect?)  
+      note.asyncEffect((effect) ->
+        pane.addEffect effect
+      )
+    else
+      pane.addEffect note.effect
+    
     Meteor.setTimeout(->
       console.debug("<< Finished conducting note with #{note.length} length")
       finishedNoteCallback()

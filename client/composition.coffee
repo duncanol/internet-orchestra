@@ -30,6 +30,7 @@ class @Section
 class @Note
 
   constructor: (config) ->
-    @getEffect = config.getEffect
+    @effect = config.effect
+    @asyncEffect = config.asyncEffect
     @length = config.length
 
