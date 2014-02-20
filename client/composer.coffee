@@ -15,58 +15,61 @@ class @Composer
     playNextComposition()
 
 
+
+  buildNotes: (section, noteBuilder, notePattern, async, finishedBuildingNotesCallback) ->
+      
+    _this = @
+
+    [thisNote, remainingNotes] = headTail(notePattern)
+
+    if (thisNote == null)
+      finishedBuildingNotesCallback()
+    else
+      asyncEffect = (effectCreatedCallback) ->
+        Meteor.call "getSnippet", (errors, snippet) ->
+          if (errors?)
+            console.error("Could not retrieve snippet - " + errors)
+            snippet = "404"
+
+          effect = noteBuilder.buildEffect(snippet)
+          effectCreatedCallback(effect)
+      
+      addNoteAndContinue = (effect, async) ->
+        note = noteBuilder.buildNote(effect, async, thisNote, section)
+        section.addNote(note)
+        _this.buildNotes section, noteBuilder, remainingNotes, async, finishedBuildingNotesCallback
+        
+
+      if (async)
+        addNoteAndContinue asyncEffect, async
+      else 
+        asyncEffect((effect) -> 
+          addNoteAndContinue effect, async
+        )
+        
+
+
+
+  buildSections: (composition, sectionBuilder, remainingSections, finishedBuildingSectionsCallback) ->
+
+    _this = @
+    if (remainingSections == 0) 
+      finishedBuildingSectionsCallback()
+    else 
+      section = sectionBuilder.buildSection()
+      composition.addSection(section)
+      noteBuilder = sectionBuilder.getNoteBuilder()
+      
+      
+      @buildNotes section, noteBuilder, section.notePattern.pattern, false, ->
+        _this.buildSections composition, sectionBuilder, remainingSections - 1, finishedBuildingSectionsCallback
+
+
+
+
   flashwords: (finishedBuildingCompositionCallback) ->
 
     _this = @
-
-    
-    buildNotes = (noteBuilder, notePattern, section, async, finishedBuildingNotesCallback) ->
-      
-      [thisNote, remainingNotes] = headTail(notePattern)
-
-      if (thisNote == null)
-        finishedBuildingNotesCallback()
-      else
-
-        asyncEffect = (effectCreatedCallback) ->
-          Meteor.call "getSnippet", (errors, snippet) ->
-            if (errors?)
-              console.error("Could not retrieve snippet - " + errors)
-              snippet = "404"
-
-            effect = noteBuilder.buildEffect(snippet)
-            effectCreatedCallback(effect)
-        
-        addNoteAndContinue = (effect, async) ->
-          note = noteBuilder.buildNote(effect, async, thisNote, section)
-          section.addNote(note)
-          buildNotes noteBuilder, remainingNotes, section, async, finishedBuildingNotesCallback
-          
-
-        if (async)
-          addNoteAndContinue asyncEffect, async
-        else 
-          asyncEffect((effect) -> 
-            addNoteAndContinue effect, async
-          )
-          
-
-
-
-    buildSections = (sectionBuilder, remainingSections, finishedBuildingSectionsCallback) ->
-
-      if (remainingSections == 0) 
-        finishedBuildingSectionsCallback()
-      else 
-        section = sectionBuilder.buildSection()
-        composition.addSection(section)
-        
-        noteBuilder = sectionBuilder.getNoteBuilder()
-        
-        
-        buildNotes noteBuilder, section.notePattern.pattern, section, false, ->
-          buildSections sectionBuilder, remainingSections - 1, finishedBuildingSectionsCallback
-
 
     tempo = ((Math.random() * 1000) + 1000)
       
@@ -118,7 +121,7 @@ class @Composer
 
 
 
-    buildSections sectionBuilder, numberOfSections, ->
+    @buildSections composition, sectionBuilder, numberOfSections, ->
       finishedBuildingCompositionCallback(composition)
 
 
