@@ -68,10 +68,3 @@ class @Conductor
       console.debug("<< Finished conducting note with #{note.length} length")
       finishedNoteCallback()
     , note.length)
-
-
-Template.nowPlayingTemplate.composition = -> Session.get("composition")
-
-Template.nowPlayingTemplate.sectionNumber = -> Session.get("sectionNumber")
-
-Template.nowPlayingTemplate.noteNumber = -> Session.get("noteNumber")

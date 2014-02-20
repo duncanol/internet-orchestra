@@ -7,17 +7,32 @@
   <div class="main-container">
     <h1>Internet<small>sympohony <i class="fa fa-cog" style="color: #CCC">Settings</i></small></h1>
     
-    <div class="input-snippets">
+    <!--<div class="input-snippets">
       <input type="text" id="snippet-text" placeholder="Text snippet" />
       <input type="text" id="snippet-source" placeholder="Text source e.g. http://computer.com" />
       <a href="#" id="snippet-share" class="btn">Share</a>
       <span id="input-snippets-feedback"></span>
+    </div>-->
+
+    <div class="input-scraper-source">
+      <input type="text" id="scraping-source" placeholder="Scrape source e.g. http://computer.com" />
+      <input type="text" id="scraping-tags" placeholder="Tags about source e.g. DIY,Tools,Science" />
+      <a href="#" id="scrape-submit" class="btn">Scrape!</a>
+      <span id="input-scrape-feedback"></span>
     </div>
 
     <div class="row">
       <div class="span12">
         <div class="well">
-          <span class="all-tags">Tags: </span>
+          <span class="snippet-count">{{> snippetCountTemplate}}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="span12">
+        <div class="well">
+          <span class="all-tags">{{> snippetTagsCountTemplate}}</span>
         </div>
       </div>
     </div>
@@ -80,3 +95,12 @@
   </div>
 </template>
     
+<template name="snippetCountTemplate">
+  {{snippetCount}} snippets scraped so far!
+</template>
+
+<template name="snippetTagsCountTemplate">
+  {{#each tagsCount}}
+    {{tag}} ({{count}}) 
+  {{/each}}
+</template>

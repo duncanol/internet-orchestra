@@ -86,8 +86,8 @@ class @Composer
     noteBuilder = 
 
       snippetQuery: (section, thisNote) ->
-        types: ['h1', 'h2']
-        tags: ['documents4', '1age']
+        types: ['h1']
+        tags: ['FUNNY']
 
       buildEffect: (snippet) ->
         words = snippet.text.split(" ")

@@ -20,28 +20,6 @@ Meteor.methods
       snippet = getRandomEntry(snippetsCollection, filter)
       console.log "Returning snippet " + snippet.text
       snippet
-        
-
-  getTagCounts: ->
-    # TODO horribly inefficient
-    allTags = snippetsCollection.find({tags: {$exists: true}}, {fields: {tags: 1}})
-    
-    tagsCount = {}
-    allTags.forEach (document) -> 
-      tagsList = document.tags
-     
-      for tag in tagsList
-        tagsCount[tag] = if tagsCount[tag]? then tagsCount[tag] + 1 else 1
-    
-    numericArray = new Array()
-    for tag, count of tagsCount 
-      numericArray.push {tag: tag, count: count}
-
-    numericArray.sort( (tag1, tag2) -> 
-      tag2.count - tag1.count;
-    )
-
-    numericArray
   
 
 
@@ -84,7 +62,7 @@ class Scraper
 
 Meteor.startup ->
   
-  resetAllSourcesLastCheckedDates();
+  # resetAllSourcesLastCheckedDates();
   scraper = new Scraper()
   
   Meteor.setInterval (->
