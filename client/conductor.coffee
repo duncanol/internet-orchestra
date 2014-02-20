@@ -57,8 +57,8 @@ class @Conductor
     console.debug(">> Starting to conduct note with #{note.length} length")
     Session.set("noteNumber", noteIndex + 1)
     
-    if (note.asyncEffect?)  
-      note.asyncEffect((effect) ->
+    if (note.async)  
+      note.effect((effect) ->
         pane.addEffect effect
       )
     else

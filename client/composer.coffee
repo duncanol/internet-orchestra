@@ -20,7 +20,7 @@ class @Composer
     _this = @
 
     
-    buildNotes = (notePattern, section, barLengthMillis, async, finishedBuildingNotesCallback) ->
+    buildNotes = (noteBuilder, notePattern, section, async, finishedBuildingNotesCallback) ->
       
       [thisNote, remainingNotes] = headTail(notePattern)
 
@@ -30,25 +30,17 @@ class @Composer
 
         asyncEffect = (effectCreatedCallback) ->
           Meteor.call "getSnippet", (errors, snippet) ->
-            words = snippet.text.split(" ")
-            randomWord = words[Math.floor Math.random() * words.length]
-            snippet.text = randomWord
-            effect = new AllAtOnce(snippet,
-              template: Template.minimalisteffectblock)
+            if (errors?)
+              console.error("Could not retrieve snippet - " + errors)
+              snippet = "404"
+
+            effect = noteBuilder.buildEffect(snippet)
             effectCreatedCallback(effect)
         
         addNoteAndContinue = (effect, async) ->
-          if (async)
-            note = new Note(
-              asyncEffect: effect, 
-              length: thisNote * barLengthMillis)
-          else 
-            note = new Note(
-              effect: effect, 
-              length: thisNote * barLengthMillis)
-          
+          note = noteBuilder.buildNote(effect, async, thisNote, section)
           section.addNote(note)
-          buildNotes remainingNotes, section, barLengthMillis, async, finishedBuildingNotesCallback
+          buildNotes noteBuilder, remainingNotes, section, async, finishedBuildingNotesCallback
           
 
         if (async)
@@ -61,29 +53,19 @@ class @Composer
 
 
 
-    buildSections = (remainingSections, finishedBuildingSectionsCallback) ->
+    buildSections = (sectionBuilder, remainingSections, finishedBuildingSectionsCallback) ->
 
       if (remainingSections == 0) 
         finishedBuildingSectionsCallback()
       else 
-        notePattern = notePatterns[0]
-
-        pane = new RollingPane(
-          domParent: "div.main-container", 
-          numberOfItems: 1)
-
-        section = new Section(
-          pane: pane, 
-          tempo: tempo,
-          notePattern: notePattern.name)
-
+        section = sectionBuilder.buildSection()
         composition.addSection(section)
         
-        barLength = 4
-        barLengthMillis = Math.floor(barLength * section.tempo)
-
-        buildNotes notePattern.pattern, section, barLengthMillis, false, ->
-          buildSections remainingSections - 1, finishedBuildingSectionsCallback
+        noteBuilder = sectionBuilder.getNoteBuilder()
+        
+        
+        buildNotes noteBuilder, section.notePattern.pattern, section, false, ->
+          buildSections sectionBuilder, remainingSections - 1, finishedBuildingSectionsCallback
 
 
     tempo = ((Math.random() * 1000) + 1000)
@@ -97,7 +79,46 @@ class @Composer
 
     numberOfSections = 16
 
-    buildSections numberOfSections, ->
+    noteBuilder = 
+
+      buildEffect: (snippet) ->
+        words = snippet.text.split(" ")
+        randomWord = words[Math.floor Math.random() * words.length]
+        snippet.text = randomWord
+        effect = new AllAtOnce(snippet,
+          template: Template.minimalisteffectblock)
+      
+      buildNote: (effect, async, notePattern, section) ->
+
+        barLength = section.barLength
+        barLengthMillis = Math.floor(barLength * section.tempo)
+
+        note = new Note(
+          effect: effect
+          length: notePattern * barLengthMillis
+          async: async)
+        
+    sectionBuilder = 
+
+      buildSection: ->
+
+        notePattern = notePatterns[0]
+
+        pane = new RollingPane(
+          domParent: "div.main-container", 
+          numberOfItems: 1)
+
+        section = new Section(
+          pane: pane, 
+          tempo: tempo,
+          notePattern: notePattern)
+
+      getNoteBuilder: ->
+        noteBuilder
+
+
+
+    buildSections sectionBuilder, numberOfSections, ->
       finishedBuildingCompositionCallback(composition)
 
 

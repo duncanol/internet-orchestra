@@ -18,6 +18,7 @@ class @Section
     @pane = config.pane
     @tempo = config.tempo
     @notePattern = config.notePattern
+    @barLength = @notePattern.pattern.length
     @notes = []
 
 
