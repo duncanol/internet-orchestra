@@ -10,11 +10,14 @@ Meteor.methods
   getSnippet: (snippetTypes, snippetTags) ->
 
     filter = {}
-    if snippetTypes? then filter.type = {$in: snippetTypes}
-    if snippetTags? then filter.tags = {$in: snippetTags}
-    
-    if snippetsCollection.find({}).count() > 0
-      snippet = getRandomEntry(snippetsCollection, {})
+    if snippetTypes? then filter.type = $in: snippetTypes
+
+    if snippetTags? then filter.tags = $in: snippetTags
+
+    console.log "Looking for snippet based on filter " + JSON.stringify(filter, undefined, 2);
+      
+    if snippetsCollection.find(filter).count() > 0
+      snippet = getRandomEntry(snippetsCollection, filter)
       console.log "Returning snippet " + snippet.text
       snippet
         

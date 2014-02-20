@@ -26,7 +26,8 @@ class @Composer
       finishedBuildingNotesCallback()
     else
       asyncEffect = (effectCreatedCallback) ->
-        Meteor.call "getSnippet", (errors, snippet) ->
+        snippetQuery = noteBuilder.snippetQuery(section, thisNote)
+        Meteor.call "getSnippet", snippetQuery.types, snippetQuery.tags, (errors, snippet) ->
           if (errors?)
             console.error("Could not retrieve snippet - " + errors)
             snippet = "404"
@@ -83,6 +84,10 @@ class @Composer
     numberOfSections = 16
 
     noteBuilder = 
+
+      snippetQuery: (section, thisNote) ->
+        types: ['h1', 'h2']
+        tags: ['documents4', '1age']
 
       buildEffect: (snippet) ->
         words = snippet.text.split(" ")
