@@ -1,13 +1,17 @@
 class Pane
 
+
+
 class @RollingPane extends Pane 
 
   constructor: (overrideConfig) ->
     @config =
       numberOfItems: 5
       domParent: "body"
+      feedStrategy: 'from-bottom'
 
     jQuery.extend @config, overrideConfig
+
     @$domParent = jQuery(@config.domParent)
     @$paneDiv = jQuery("<div class=\"rolling-pane row\"></div>")
     @$paneList = jQuery("<ul class=\"rolling-pane-list snippet-block span12\"></ul>")
@@ -19,12 +23,27 @@ class @RollingPane extends Pane
   stop: ->
     @$paneDiv.remove()
 
-  addEffect: (effect) ->
+  addEffect: (effect, length, finishedEffectCallback) ->
     $listItems = @$paneList.find("li")
-    if $listItems.length is @config.numberOfItems then $listItems[0].remove()
     $snippetContainer = jQuery("<li class=\"well\"></li>")
-    $snippetContainer.appendTo @$paneList
-    effect.start $snippetContainer
+
+    if $listItems.length is @config.numberOfItems
+      switch @config.feedStrategy
+        when 'from-top'
+          $listItems[0].remove()
+        when 'from-bottom'
+          $listItems[$listItems.length - 1].remove()
+      
+    switch @config.feedStrategy
+      when 'from-top'
+        $snippetContainer.prependTo @$paneList
+      when 'from-bottom'
+        $snippetContainer.appendTo @$paneList
+    
+
+    effect.start $snippetContainer, length, finishedEffectCallback
+
+
 
 class @GridPane extends Pane
 

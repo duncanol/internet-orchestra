@@ -82,29 +82,6 @@ class @Composer
       transitionSmoothness: 'not yet implemented')
 
     numberOfSections = 16
-
-    noteBuilder = 
-
-      snippetQuery: (section, thisNote) ->
-        types: ['h1']
-        tags: ['FUNNY']
-
-      buildEffect: (snippet) ->
-        words = snippet.text.split(" ")
-        randomWord = words[Math.floor Math.random() * words.length]
-        snippet.text = randomWord
-        effect = new AllAtOnce(snippet,
-          template: Template.minimalisteffectblock)
-      
-      buildNote: (effect, async, notePattern, section) ->
-
-        barLength = section.barLength
-        barLengthMillis = Math.floor(barLength * section.tempo)
-
-        note = new Note(
-          effect: effect
-          length: notePattern * barLengthMillis
-          async: async)
         
     sectionBuilder = 
 
@@ -122,12 +99,93 @@ class @Composer
           notePattern: notePattern)
 
       getNoteBuilder: ->
-        noteBuilder
+
+        snippetQuery: (section, thisNote) ->
+          types: ['p']
+          tags: ['NEWS']
+
+        buildEffect: (snippet) ->
+          words = snippet.text.split(" ")
+          nonEmptyWords = (word for word in words when word.trim().length > 0)
+          randomWord = nonEmptyWords[Math.floor Math.random() * nonEmptyWords.length]
+          snippet.text = randomWord
+
+          new AllAtOnce(snippet, template: Template.minimalisteffectblock)
+        
+        buildNote: (effect, async, notePattern, section) ->
+
+          barLength = section.barLength
+          barLengthMillis = Math.floor(barLength * section.tempo)
+
+          note = new Note(
+            effect: effect
+            length: notePattern * barLengthMillis
+            async: async)
 
 
 
     @buildSections composition, sectionBuilder, numberOfSections, ->
       finishedBuildingCompositionCallback(composition)
+
+
+
+
+
+  headlines: (finishedBuildingCompositionCallback) ->
+
+    _this = @
+
+    tempo = ((Math.random() * 2000) + 3000)
+
+    notePatterns = [{name: '4 beats', pattern: [1/4, 1/4, 1/4, 1/4]}]
+      
+    composition = new Composition(
+      name: "headlines", 
+      tempo: tempo,
+      transitionSmoothness: 'not yet implemented')
+
+    numberOfSections = 16
+
+    sectionBuilder = 
+
+      buildSection: ->
+
+        notePattern = notePatterns[0]
+
+        pane = new RollingPane(
+          domParent: "div.main-container", 
+          numberOfItems: 5,
+          feedStrategy: 'from-top')
+
+        section = new Section(
+          pane: pane, 
+          tempo: tempo,
+          notePattern: notePattern)
+
+      getNoteBuilder: ->
+
+        snippetQuery: (section, thisNote) ->
+          types: ['h1', 'h2', 'h3']
+          tags: ['NEWS']
+
+        buildEffect: (snippet) ->
+          _this.allAtOnceEffect(snippet)
+        
+        buildNote: (effect, async, notePattern, section) ->
+
+          barLength = section.barLength
+          barLengthMillis = Math.floor(barLength * section.tempo)
+
+          note = new Note(
+            effect: effect
+            length: notePattern * barLengthMillis
+            async: async)
+        
+
+
+    @buildSections composition, sectionBuilder, numberOfSections, ->
+      finishedBuildingCompositionCallback(composition)
+
 
 
 
@@ -185,12 +243,17 @@ class @Composer
     new AllAtOnce snippet, overrideConfig
 
   randomPane: ->
+    ## paneFunctions = [@headlines]
     paneFunctions = [@flashwords]
-    ##, @gridPane, @rollingPane] 
+    ##, @flashwords, @gridPane, @rollingPane] 
     random = Math.floor(Math.random() * paneFunctions.length)
     paneFunctions[random]
 
-  randomEffect: ->
-    effectsFunctions = [@slideshowEffect, @allAtOnceEffect, @tickerEffect]
+  randomEffect: (effectFunctionSelection) ->
+    effectsFunctions = if (effectFunctionSelection?)
+      effectFunctionSelection 
+    else 
+      [@slideshowEffect, @allAtOnceEffect, @tickerEffect]
+    
     random = Math.floor(Math.random() * effectsFunctions.length)
     effectsFunctions[random]

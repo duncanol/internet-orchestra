@@ -4,7 +4,17 @@ class @Conductor
 
 
   conduct: (composition, finishedCompositionCallback) -> 
-  	@conductComposition(composition, finishedCompositionCallback)
+    @conductComposition(composition, finishedCompositionCallback)
+    @paused = false
+    @stopped = false
+    
+
+  pause: ->
+    @paused = true
+
+
+  stop: ->
+    @stopped = true
 
 
   conductComposition: (composition, finishedCompositionCallback) -> 
@@ -57,14 +67,18 @@ class @Conductor
     console.debug(">> Starting to conduct note with #{note.length} length")
     Session.set("noteNumber", noteIndex + 1)
     
-    if (note.async)  
-      note.effect((effect) ->
-        pane.addEffect effect
-      )
-    else
-      pane.addEffect note.effect
-    
-    Meteor.setTimeout(->
-      console.debug("<< Finished conducting note with #{note.length} length")
-      finishedNoteCallback()
-    , note.length)
+    if @stopped
+      pane.stop()
+
+    if not @paused and not @stopped
+
+      if note.async
+        note.effect((effect) ->
+          pane.addEffect effect, note.length, ->
+          console.debug("<< Finished conducting note with #{note.length} length")
+          finishedNoteCallback()
+        )
+      else
+        pane.addEffect note.effect, note.length, ->
+          console.debug("<< Finished conducting note with #{note.length} length")
+          finishedNoteCallback()

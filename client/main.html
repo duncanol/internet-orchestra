@@ -1,11 +1,13 @@
 <head>
-  <title>Internet Symphony</title>
+  <title>Internet Sounds</title>
   <link rel="stylesheet" href="/font-awesome-4.0.3/css/font-awesome.min.css">
 </head>
 
 <body>
   <div class="main-container">
-    <h1>Internet<small>sympohony <i class="fa fa-cog" style="color: #CCC">Settings</i></small></h1>
+    <h1>Internet<small>sounds <i class="fa fa-cog" style="color: #CCC">Settings</i></small></h1>
+
+    <a href="#" id="start-button">Start</a> <a href="#" id="pause-button">Pause</a>
     
     <!--<div class="input-snippets">
       <input type="text" id="snippet-text" placeholder="Text snippet" />
@@ -55,13 +57,13 @@
 
 <template name="effectblock">
   <h2>{{type}}
-    <small>
+    <!--<small>
       <i class="fa fa-smile-o"> Like</i><span class="divider">&nbsp;</span>
       <i class="fa fa-frown-o"> NoLike</i><span class="divider">&nbsp;</span> 
       <i class="fa fa-ban-o"> Ban</i><span class="divider">&nbsp;</span>
       <i class="fa fa-comment-o"> Comment</i><span class="divider">&nbsp;</span> 
       <i class="fa fa-lock"> Hold</i><span class="divider">&nbsp;</span>
-    </small>
+    </small>-->
   </h2>
   
   {{#each tags}}
@@ -69,10 +71,10 @@
   {{/each}}
   
   {{#if href}}
-    <a href="{{href}}"><span class="snippet-block-paragraph"></span></a>
+    <a href="{{href}}"><span class="snippet-block-paragraph" aria-live="assertive"</span></a>
   {{/if}}
   {{#unless href}}
-    <p><span class="snippet-block-paragraph"></span></p>
+    <p><span class="snippet-block-paragraph" aria-live="assertive"></span></p>
   {{/unless}}
 
   <p><a href="" class="snippet-block-source-url"></a></p>
@@ -80,12 +82,13 @@
 
 
 <template name="minimalisteffectblock">
-  <p class="snippet-block-paragraph-centered"><span class="snippet-block-paragraph"></span></p>
+  <p class="snippet-block-paragraph-centered"><span class="snippet-block-paragraph" aria-live="assertive"></span></p>
 </template>
 
 <template name="nowPlayingTemplate">
   <div>
-    <span>Now playing </span><span class="composition-name">"{{ composition.name }}" at {{composition.bpm}} BPM</span>
+    <h2>{{ composition.name }}</h2>
+    <span>{{composition.bpm}} BPM</span>
   </div>
   <div>
     <span>Section: </span><span class="section-number">{{ sectionNumber }}</span>

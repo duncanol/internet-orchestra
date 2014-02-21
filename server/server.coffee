@@ -20,6 +20,9 @@ Meteor.methods
       snippet = getRandomEntry(snippetsCollection, filter)
       console.log "Returning snippet " + snippet.text
       snippet
+    else 
+      text: "404"
+      source: "no source"
   
 
 
@@ -27,6 +30,7 @@ Meteor.methods
 class Scraper
 
   scrapeUrl: (source, patterns) ->
+    _this = @
     url = source.source
     console.log "Scraping URL " + url + " for patterns " + patterns + "..."
     
@@ -37,19 +41,25 @@ class Scraper
       if matches? and matches.length > 0
         matches.each( (i, elem) ->
           domNode = cheerio(elem)
-          text = domNode.text().trim()
-          type = pattern
-          if text.length > 0
+          pureText = domNode.text().trim()
+
+          if pureText.length > 0
+
+            escaped = _this.escapeTextBeforeStoring(pureText)
+
+            type = pattern
+          
             existing = snippetsCollection.find(
-              text: text
+              text: escaped
               source: url
               type: type
             ).count()
+
             if existing is 0
-              console.log "Inserting " + text
+              console.log "Inserting " + escaped
               
               record =
-                text: text
+                text: escaped
                 source: url
                 type: type
 
@@ -59,10 +69,38 @@ class Scraper
               snippetsCollection.insert record
         )
 
+  escapeTextBeforeStoring: (pureText) ->
+    @trim(@singleLine(@replaceMicrosoftCharacters(pureText)))
+
+
+  replaceMicrosoftCharacters: (pureText) ->
+    # smart single quotes and apostrophe
+    escaped = pureText.replace(/[\u2018|\u2019|\u201A]/g, "\'")
+    # smart double quotes
+    escaped = escaped.replace(/[\u201C|\u201D|\u201E]/g, "\"")
+    # ellipsis
+    escaped = escaped.replace(/\u2026/g, "...")
+    # dashes
+    escaped = escaped.replace(/[\u2013|\u2014]/g, "-")
+    # circumflex
+    escaped = escaped.replace(/\u02C6/g, "^")
+    # open angle bracket
+    escaped = escaped.replace(/\u2039/g, "")
+    # spaces
+    escaped.replace(/[\u02DC|\u00A0]/g, " ")
+
+
+  singleLine: (pureText) ->
+    pureText.split('\n')[0]
+    
+
+  trim: (pureText) ->
+    pureText.replace('\\t', " ").trim()
+
 
 Meteor.startup ->
   
-  # resetAllSourcesLastCheckedDates();
+  resetAllSourcesLastCheckedDates()
   scraper = new Scraper()
   
   Meteor.setInterval (->

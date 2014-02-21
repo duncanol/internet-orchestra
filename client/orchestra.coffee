@@ -3,3 +3,9 @@ class @Orchestra
 
   start: ->
     @composer.compose @conductor
+
+  pause: ->
+    @conductor.pause()
+
+  stop: ->
+    @conductor.stop()

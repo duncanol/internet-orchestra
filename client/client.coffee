@@ -74,10 +74,13 @@ Meteor.startup ->
       jQuery("#input-scrape-feedback").append "Thanks!"
     false
 
+  jQuery('#pause-button').on "click", ->
+    console.log "Paused!"
+    if window.orchestra? then window.orchestra.pause()
 
-Meteor.startup ->
-  
-  orchestra = new Orchestra(new Composer(), new Conductor())
-  orchestra.start()
-
-   
+  jQuery('#start-button').on "click", ->
+    console.log "Started!"
+    if window.orchestra? then window.orchestra.stop()
+    
+    window.orchestra = new Orchestra(new Composer(), new Conductor())
+    window.orchestra.start()   
